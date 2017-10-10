@@ -2,7 +2,7 @@
 
 **A calculator for a calculator!**
 
-This script calculates the average session duration on the OSU Carbon Calculator. To use the script, you can either:
+This script calculates the average session duration on the OSU Carbon Calculator (http://carbon.campusops.oregonstate.edu/). To use the script, you can either:
   A. Use the sample data.csv file provided, or
   B. Download the most recent data.csv file stored on the Carbon Calculator's server.
 
