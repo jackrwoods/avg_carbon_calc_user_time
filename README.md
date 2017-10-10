@@ -1,6 +1,6 @@
 # Average Carbon Calculator User Time Calculator
 
-**A calculator for a calculator!
+**A calculator for a calculator!**
 
 This script calculates the average session duration on the OSU Carbon Calculator. To use the script, you can either:
   A. Use the sample data.csv file provided, or
