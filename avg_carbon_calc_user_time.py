@@ -12,6 +12,18 @@ import time # To calculate elapsed time during calculation, and conversions.
 
 elapsed_time = time.clock()
 
+def findIPInFile(lineNum, f, oldTime):
+    newTime = oldTime # newTime is the most recent time found. Δt will be
+                      # found with: newTime-oldTime
+    f.seek(line_offset[lineNum]) # Seek to specific line number
+    line = f.readline()
+    ip = line[23:line[23].index(",")] # Retrieve this line's IP address
+    while (strptime(line[:23], "%b/%d/%y,%I:%M:%S%p") - oldTime <= 15 minutes):
+        if line[23:line[23].index(",")] == ip:
+            newTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")
+            # Can't delete line because that would require rebuilding line_offset
+    return newTime
+
 print("Welcome to Jack's Average Session Time Calculator!\n")
 
 filename = ""
@@ -26,20 +38,30 @@ else:
 
 f = open(filename, r) # Open data file for reading.
 
-# A user is assumed to be 1 IP Address. This will be optimized later for
-# increased accuracy.
-
-# The script iterates over every IP address in the list. For each IP address
-# found, a new entry is made in a 2-D array, user_total_time.
-
-# user_total_time contains a running total of each user's time spent on the
-# Carbon Calculator, and the most recent data/time the user accessed the
-# Carbon Calculator.
-user_total_time = [][] # Create empty list array.
-
+#################From StackOverflow#########################
+# Read in the file once and build a list of line offsets
+line_offset = []
+offset = 0
 for line in f:
-    if user_total_time.index(line[23:line[23].index(",")]): # Search array for
-        # Inside Loop                                       # IP Address
-    # Time is saved in this format: XX Month/XX Day/XXXX Year,Hour (12):Min:Sec(pm/am)
-    time.strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")
-    if
+    line_offset.append(offset)
+    offset += len(line)
+f.seek(0)
+
+# Now, skip to first line.
+f.seek(line_offset[0])
+#################End StackOverflow Code#####################
+
+
+lineNum = 0 # Count lines to get the current line number
+for line in f: # Iterate over all lines in CSV
+
+    i = line[23:line[23].index(",")])
+    if (i): # Search array for IP Address
+        # Time is saved in this format: XX Month/XX Day/XXXX Year,Hour (12):
+        # Min:Sec(pm/am)
+        currentTime = user_total_time[i][1]
+        newTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")
+
+
+    lineNum++ #increment to new line number.
+# End of Loop
