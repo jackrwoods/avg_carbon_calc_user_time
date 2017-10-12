@@ -30,7 +30,7 @@ f = open(filename, r) # Open data file for reading.
 # increased accuracy.
 
 # The script iterates over every IP address in the list. For each IP address
-# found, a new entry is made in two arrays, user_total_time and user_last_time.
+# found, a new entry is made in a 2-D array, user_total_time.
 
 # user_total_time contains a running total of each user's time spent on the
 # Carbon Calculator, and the most recent data/time the user accessed the
@@ -38,5 +38,8 @@ f = open(filename, r) # Open data file for reading.
 user_total_time = [][] # Create empty list array.
 
 for line in f:
+    if user_total_time.index(line[23:line[23].index(",")]): # Search array for
+        # Inside Loop                                       # IP Address
     # Time is saved in this format: XX Month/XX Day/XXXX Year,Hour (12):Min:Sec(pm/am)
     time.strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")
+    if
