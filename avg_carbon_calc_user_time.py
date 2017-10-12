@@ -12,17 +12,21 @@ import time # To calculate elapsed time during calculation, and conversions.
 
 elapsed_time = time.clock()
 
-def findIPInFile(lineNum, f, oldTime):
+def findIPInFile(lineNum, f, oldTime, ipDict):
     newTime = oldTime # newTime is the most recent time found. Δt will be
                       # found with: newTime-oldTime
     f.seek(line_offset[lineNum]) # Seek to specific line number
     line = f.readline()
     ip = line[23:line[23].index(",")] # Retrieve this line's IP address
+    # TODO: Write function to convert time tuples to ints/doubles for comparison
     while (strptime(line[:23], "%b/%d/%y,%I:%M:%S%p") - oldTime <= 15 minutes):
-        if line[23:line[23].index(",")] == ip:
-            newTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")
-            # Can't delete line because that would require rebuilding line_offset
+        # Check to make sure this IP hasn't been counted before.
+        # If it has been more than 15 minutes, consider it a new session.
+        if (line[23:line[23].index(",")] == ip) and (!(ip in ipDict) or (oldTime - ipDict[ip] > 15 minutes)):
+            newTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p") # Update most recent time
+            ipDict[ip] = newTime; # Add new key to dictionary or replace old value
     return newTime
+# End findIPInFile
 
 print("Welcome to Jack's Average Session Time Calculator!\n")
 
