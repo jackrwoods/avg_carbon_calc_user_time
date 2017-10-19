@@ -12,15 +12,22 @@ import time # To calculate elapsed time during calculation, and conversions.
 
 elapsed_time = time.clock()
 
-def findIPInFile(lineNum, f, oldTime, ipDict):
-    newTime = oldTime # newTime is the most recent time found. Δt will be
-                      # found with: newTime-oldTime
-    f.seek(line_offset[lineNum]) # Seek to specific line number
+def findIPInFile(lineNum, line_offset, f, oldTime):
+    newTime = oldTime # newTime is the most recent time found.
+    f.seek(line_offset[lineNum]) # Seek to specific line number.
     line = f.readline()
-    ip = line[23:line[23].index(",")] # Retrieve this line's IP address
-    # TODO: Write function to convert time tuples to ints/doubles for comparison
-    while (strptime(line[:23], "%b/%d/%y,%I:%M:%S%p") - oldTime <= 15 minutes):
-        # Check to make sure this IP hasn't been counted before.
+    ip = line[23:line[23].index(",")] # Retrieve this line's IP address.
+
+
+
+
+
+
+    
+    # Move to the next line in the file.
+    f.seek(line_offset[lineNum + 1])
+    line = f.readline()
+    while (time.mktime(strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")) - time.mktime(oldTime) <= 900) && (line[23:line[23].index(",")] == ip): # 900 seconds is fifteen minutes, and time.mktime outputs seconds since epoch
         # If it has been more than 15 minutes, consider it a new session.
         if (line[23:line[23].index(",")] == ip) and (!(ip in ipDict) or (oldTime - ipDict[ip] > 15 minutes)):
             newTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p") # Update most recent time
@@ -57,15 +64,14 @@ f.seek(line_offset[0])
 
 
 lineNum = 0 # Count lines to get the current line number
+totalTime = 0; # totalTime/totalSessions = average session time.
+totalSessions = 0;
 for line in f: # Iterate over all lines in CSV
-
-    i = line[23:line[23].index(",")])
-    if (i): # Search array for IP Address
-        # Time is saved in this format: XX Month/XX Day/XXXX Year,Hour (12):
-        # Min:Sec(pm/am)
-        currentTime = user_total_time[i][1]
-        newTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")
+    if line[0] != 'z': # A Z is added to the beginning of every line that's already counted.
+        currentTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")
+        newTime = findIPInFile(linenum, line_offset, f, currentTime)
 
 
-    lineNum++ #increment to new line number.
+
+    lineNum = linenum + 1 #increment to new line number.
 # End of Loop
