@@ -59,7 +59,6 @@ def main():
             line = lines[i]
             currentTime = time.strptime(line[:21], "%m/%d/%Y,%I:%M:%S%p")
             newTime = findIPInFile(i, lines, currentTime)
-            print (newTime)
             totalSessions = totalSessions + 1
             totalTime = totalTime + (newTime-time.mktime(currentTime))
         lineNum = lineNum + 1 #increment to new line number.
