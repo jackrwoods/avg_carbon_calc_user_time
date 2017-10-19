@@ -12,26 +12,21 @@ import time # To calculate elapsed time during calculation, and conversions.
 
 elapsed_time = time.clock()
 
-def findIPInFile(lineNum, line_offset, f, oldTime):
+# findIPInFile finds the last entry for this user session, and returns the time the entry was created.
+def findIPInFile(lineNum, lines, oldTime):
     newTime = oldTime # newTime is the most recent time found.
-    f.seek(line_offset[lineNum]) # Seek to specific line number.
-    line = f.readline()
-    ip = line[23:line[23].index(",")] # Retrieve this line's IP address.
+    ip = lines[lineNum][23:line[23].index(",")] # Retrieve this line's IP address.
 
-
-
-
-
-
-    
-    # Move to the next line in the file.
-    f.seek(line_offset[lineNum + 1])
-    line = f.readline()
-    while (time.mktime(strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")) - time.mktime(oldTime) <= 900) && (line[23:line[23].index(",")] == ip): # 900 seconds is fifteen minutes, and time.mktime outputs seconds since epoch
-        # If it has been more than 15 minutes, consider it a new session.
-        if (line[23:line[23].index(",")] == ip) and (!(ip in ipDict) or (oldTime - ipDict[ip] > 15 minutes)):
-            newTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p") # Update most recent time
-            ipDict[ip] = newTime; # Add new key to dictionary or replace old value
+    while lineNum < len(lines):
+        if line[0] != 'z':
+            # If it has been more than 15 minutes, exit the loop (session has ended already).
+            if time.mktime(strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")) - time.mktime(newTime) <= 900): # 900 seconds is fifteen minutes, and time.mktime outputs seconds since epoch.
+                if line[23:line[23].index(",")] == ip: # Check that current line is an entry for the current IP.
+                    newTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p") # Update most recent time.
+                    line[lineNum][0] = 'z' # Mark that this line has been counted already.
+            else:
+                break
+        lineNum = lineNum + 1 # Select the next line.
     return newTime
 # End findIPInFile
 
@@ -48,28 +43,17 @@ else:
     filename = sys.argv[1]
 
 f = open(filename, r) # Open data file for reading.
-
-#################From StackOverflow#########################
-# Read in the file once and build a list of line offsets
-line_offset = []
-offset = 0
-for line in f:
-    line_offset.append(offset)
-    offset += len(line)
-f.seek(0)
-
-# Now, skip to first line.
-f.seek(line_offset[0])
-#################End StackOverflow Code#####################
+lines = f.readlines() # Save CSV in memory.
+f.close() # Close file.
 
 
 lineNum = 0 # Count lines to get the current line number
 totalTime = 0; # totalTime/totalSessions = average session time.
 totalSessions = 0;
-for line in f: # Iterate over all lines in CSV
-    if line[0] != 'z': # A Z is added to the beginning of every line that's already counted.
+for i in range(0, len(lines)): # Iterate over all lines in CSV
+    if lines[i][0] != 'z': # A Z is added to the beginning of every line that's already counted.
         currentTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")
-        newTime = findIPInFile(linenum, line_offset, f, currentTime)
+        newTime = findIPInFile(i, lines, currentTime)
 
 
 
