@@ -28,34 +28,38 @@ def findIPInFile(lineNum, lines, oldTime):
                 break
         lineNum = lineNum + 1 # Select the next line.
     return newTime
-# End findIPInFile
+# End of findIPInFile.
 
-print("Welcome to Jack's Average Session Time Calculator!\n")
+def main():
+    print("Welcome to Jack's Average Session Time Calculator!\n")
 
-filename = ""
+    filename = ""
 
-if len(sys.argv) == 1:
-    print("Remember: You can enter a custom filename using a command line\n")
-    print("          argument. IE: python3 avg_carbon_calc_user_time data.csv\n")
-    print("Since no file was specified, the default data.csv will be used.\n")
-    filename = "data.csv"
-else:
-    filename = sys.argv[1]
+    if len(sys.argv) == 1:
+        print("Remember: You can enter a custom filename using a command line\n")
+        print("          argument. IE: python3 avg_carbon_calc_user_time data.csv\n")
+        print("Since no file was specified, the default data.csv will be used.\n")
+        filename = "data.csv"
+    else:
+        filename = sys.argv[1]
 
-f = open(filename, r) # Open data file for reading.
-lines = f.readlines() # Save CSV in memory.
-f.close() # Close file.
-
-
-lineNum = 0 # Count lines to get the current line number
-totalTime = 0; # totalTime/totalSessions = average session time.
-totalSessions = 0;
-for i in range(0, len(lines)): # Iterate over all lines in CSV
-    if lines[i][0] != 'z': # A Z is added to the beginning of every line that's already counted.
-        currentTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")
-        newTime = findIPInFile(i, lines, currentTime)
+    f = open(filename, r) # Open data file for reading.
+    lines = f.readlines() # Save CSV in memory.
+    f.close() # Close file.
 
 
+    lineNum = 0 # Count lines to get the current line number
+    totalTime = 0; # totalTime/totalSessions = average session time.
+    totalSessions = 0;
+    for i in range(0, len(lines)): # Iterate over all lines in CSV
+        if lines[i][0] != 'z': # A Z is added to the beginning of every line that's already counted.
+            currentTime = strptime(line[:23], "%b/%d/%y,%I:%M:%S%p")
+            newTime = findIPInFile(i, lines, currentTime)
+            totalSessions = totalSessions + 1
+            totalTime = totalTime + (newTime-oldTime)
+        lineNum = linenum + 1 #increment to new line number.
+    # End of Loop.
 
-    lineNum = linenum + 1 #increment to new line number.
-# End of Loop
+    print("The average session time is " + (totalTime/totalSessions/60) + " minutes per session.") # Divide by 60 to convert seconds to minutes.
+# End of main.
+main() # Call main function.
