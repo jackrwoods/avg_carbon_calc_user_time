@@ -11,8 +11,6 @@ import sys # To access command line arguments.
 import time # To calculate elapsed time during calculation, and conversions.
 import urllib.request # To download CSV files from our webserver.
 
-elapsed_time = time.clock()
-
 # findIPInFile finds the last entry for this user session, and returns the time the entry was created.
 def findIPInFile(lineNum, lines, oldTime):
     newTime = oldTime # newTime is the most recent time found.
