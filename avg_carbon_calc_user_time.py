@@ -15,19 +15,23 @@ import urllib.request # To download CSV files from our webserver.
 def findIPInFile(lineNum, lines, oldTime):
     newTime = oldTime # newTime is the most recent time found.
     line = lines[lineNum]
-    ip = line[21:line[21].index(",")] # Retrieve this line's IP address.
-
+    ip = line[22:22+line[22:].index(",")] # Retrieve this line's IP address.
     while lineNum < len(lines):
         line = lines[lineNum]
         if line[0] != 'z':
-            # If it has been more than 15 minutes, exit the loop (session has ended already).
-            # 900 seconds is fifteen minutes, and time.mktime outputs seconds since epoch.
-            if time.mktime(time.strptime(line[:21], "%m/%d/%Y,%I:%M:%S%p")) - time.mktime(newTime) <= 900:
-                if line[21:line[21].index(",")] == ip: # Check that current line is an entry for the current IP.
-                    newTime = time.strptime(line[:21], "%m/%d/%Y,%I:%M:%S%p") # Update most recent time.
-                    lines[lineNum] = 'z' # Mark that this line has been counted already.
-            else:
-                break
+            try:
+                # If it has been more than 15 minutes, exit the loop (session has ended already).
+                # 900 seconds is fifteen minutes, and time.mktime outputs seconds since epoch.
+                if time.mktime(time.strptime(line[:21], "%m/%d/%Y,%I:%M:%S%p")) - time.mktime(newTime) <= 900:
+                    if line[22:22+line[22:].index(",")] == ip: # Check that current line is an entry for the current IP.
+                        newTime = time.strptime(line[:21], "%m/%d/%Y,%I:%M:%S%p") # Update most recent time.
+                        lines[lineNum] = 'z' # Mark that this line has been counted already.
+                else:
+                    break
+            except ValueError as e:
+                # Sometimes, our webserver glitches and doesn't finish writing a line to the data file.
+                # This try/except just skips incomplete lines.
+                print ("Error: " + str(e) + " on line " + str(lineNum) + ".")
         lineNum = lineNum + 1 # Select the next line.
     return time.mktime(newTime)
 # End of findIPInFile.
@@ -53,22 +57,32 @@ def main():
 
     downloadCSV()
 
-    f = open(filename, 'r') # Open data file for reading.
-    lines = f.readlines() # Save CSV in memory.
-    f.close() # Close file.
+    try:
+        f = open(filename, 'r') # Open data file for reading.
+        lines = f.readlines() # Save CSV in memory.
+        f.close() # Close file.
+    except FileNotFoundError as e:
+        print ("The filename specified was not found!")
+        quit()
 
 
     lineNum = 0 # Count lines to get the current line number
     totalTime = 0; # totalTime/totalSessions = average session time.
     totalSessions = 0;
     for i in range(0, len(lines)): # Iterate over all lines in CSV
-        if lines[i][0] != 'z' and lines[i][0] != '\n': # A Z is added to the beginning of every line that's already counted.
-            line = lines[i]
-            currentTime = time.strptime(line[:21], "%m/%d/%Y,%I:%M:%S%p")
-            newTime = findIPInFile(i, lines, currentTime)
-            totalSessions = totalSessions + 1
-            totalTime = totalTime + (newTime-time.mktime(currentTime))
-        lineNum = lineNum + 1 #increment to new line number.
+        try:
+            if lines[i][0] != 'z' and lines[i][0] != '\n': # A Z is added to the beginning of every line that's already counted.
+                line = lines[i]
+                currentTime = time.strptime(line[:21], "%m/%d/%Y,%I:%M:%S%p")
+                newTime = findIPInFile(i, lines, currentTime)
+                totalSessions = totalSessions + 1
+                print("Sesion :"+ str(newTime-time.mktime(currentTime)))
+                totalTime = totalTime + (newTime-time.mktime(currentTime))
+            lineNum = lineNum + 1 #increment to new line number.
+        except ValueError as e:
+            # Sometimes, our webserver glitches and doesn't finish writing a line to the data file.
+            # This try/except just skips incomplete lines.
+            print ("Error: " + str(e) + " on line " + str(lineNum) + ".")
     # End of Loop.
     print("The average session time is " + str(totalTime/totalSessions/60) + " minutes per session.") # Divide by 60 to convert seconds to minutes.
 # End of main.
