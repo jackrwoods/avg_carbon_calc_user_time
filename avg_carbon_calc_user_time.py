@@ -9,6 +9,7 @@
 
 import sys # To access command line arguments.
 import time # To calculate elapsed time during calculation, and conversions.
+import urllib.request # To download CSV files from our webserver.
 
 elapsed_time = time.clock()
 
@@ -33,6 +34,12 @@ def findIPInFile(lineNum, lines, oldTime):
     return time.mktime(newTime)
 # End of findIPInFile.
 
+# downloadCSV downloads the most current data.csv file from our webserver.
+def downloadCSV():
+    url = "http://carbon.campusops.oregonstate.edu/php/data.csv"
+    urllib.request.urlretrieve(url, "data.csv")
+# End downloadCSV
+
 def main():
     print("Welcome to Jack's Average Session Time Calculator!\n")
 
@@ -41,10 +48,12 @@ def main():
     if len(sys.argv) == 1:
         print("Remember: You can enter a custom filename using a command line\n")
         print("          argument. IE: python3 avg_carbon_calc_user_time data.csv\n")
-        print("Since no file was specified, the default data.csv will be used.\n")
+        print("Since no file was specified, the default data.csv will be downloaded and used.\n")
         filename = "data.csv"
     else:
         filename = sys.argv[1]
+
+    downloadCSV()
 
     f = open(filename, 'r') # Open data file for reading.
     lines = f.readlines() # Save CSV in memory.
