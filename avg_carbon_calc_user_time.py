@@ -75,9 +75,12 @@ def main():
                 line = lines[i]
                 currentTime = time.strptime(line[:21], "%m/%d/%Y,%I:%M:%S%p")
                 newTime = findIPInFile(i, lines, currentTime)
-                totalSessions = totalSessions + 1
-                print("Sesion :"+ str(newTime-time.mktime(currentTime)))
-                totalTime = totalTime + (newTime-time.mktime(currentTime))
+                dt = newTime-time.mktime(currentTime)
+                print("Sesion :"+ str(dt))
+                # Skip sessions that last 0 seconds
+                if dt > 0:
+                    totalTime = totalTime + (newTime-time.mktime(currentTime))
+                    totalSessions = totalSessions + 1
             lineNum = lineNum + 1 #increment to new line number.
         except ValueError as e:
             # Sometimes, our webserver glitches and doesn't finish writing a line to the data file.
